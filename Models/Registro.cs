@@ -8,4 +8,3 @@ namespace MarianelaVentura_AP1_P2.Models
         public int RegistroId { get; set; }
     }
 }
-n
