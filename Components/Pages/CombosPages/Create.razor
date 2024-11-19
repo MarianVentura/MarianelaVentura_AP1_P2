@@ -124,7 +124,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ListaArticulos = await combosDetalleService.Listar(cd => cd.ArticuloId > 0);
+      Combo.CombosDetalles = new List<CombosDetalle>();
+
     }
 
     public void AgregarDetalle()
