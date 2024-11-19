@@ -1,0 +1,120 @@
+﻿@page "/Combos/Index"
+@using MarianelaVentura_AP1_P2.Models
+@using MarianelaVentura_AP1_P2.Services
+@inject CombosService combosService
+@inject NavigationManager navigationManager
+
+<PageTitle>Lista de Combos</PageTitle>
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title">Listado de Combos</h5>
+        </div>
+
+        <div class="card-body">
+            @* Filtro y búsqueda *@
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <label class="col-form-label"><strong>Filtrar por</strong></label>
+                    <InputSelect class="form-select" @bind-Value="Filtro">
+                        <option value="" selected disabled>Elija una opción</option>
+                        <option value="Descripcion">Descripción</option>
+                    </InputSelect>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="col-form-label"><strong>Búsqueda</strong></label>
+                    <div class="input-group">
+                        <input class="form-control" @bind="ValorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+
+                @* Botón de restablecer *@
+                <div class="col-md-2 d-flex align-items-center">
+                    <button class="btn btn-outline-secondary" @onclick="Restablecer">Restablecer</button>
+                </div>
+            </div>
+
+            @* Tabla de combos *@
+            <table class="table table-hover">
+                <thead class="table table-striped text-black">
+                    <tr>
+                        <th><strong>ComboId</strong></th>
+                        <th><strong>Fecha</strong></th>
+                        <th><strong>Descripción</strong></th>
+                        <th><strong>Precio</strong></th>
+                        <th><strong>Vendido</strong></th>
+                        <th><strong>Ver</strong></th>
+                        <th><strong>Editar</strong></th>
+                        <th><strong>Eliminar</strong></th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @foreach (var combo in ListaCombos)
+                    {
+                        <tr>
+                            <td> @combo.ComboId</td>
+                            <td> @combo.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td> @combo.Descripcion</td>
+                            <td> @combo.Precio.ToString("C")</td>
+                            <td> @(combo.Vendido ? "Sí" : "No")</td>
+                            <td class="text-center">
+                                <a href="/Combos/Edit/@combo.ComboId" class="btn btn-outline-success bi bi-pencil-square"></a>
+                                <a href="/Combos/Delete/@combo.ComboId" class="btn btn-outline-danger bi bi-trash"></a>
+                                <a href="/Combos/Details/@combo.ComboId" class="btn btn-outline-primary bi bi-eye-fill"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @* Botón Crear abajo de la tabla *@
+            <div class="text-end mt-3">
+                <a href="/Combos/Create" class="btn btn-success">
+                    <span class="bi bi-plus-square"></span> Crear
+                </a>
+            </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <label>Cantidad: @ListaCombos.Count()</label>
+            <label>Total: @ListaCombos.Sum(c => c.Precio).ToString("C")</label>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Combos> ListaCombos { get; set; } = new List<Combos>();
+
+    public string Filtro { get; set; } = string.Empty;
+    public string ValorFiltro { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ListaCombos = await combosService.Listar(c => c.ComboId > 0);
+    }
+
+    private async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(ValorFiltro))
+        {
+            if (Filtro == "Descripcion")
+            {
+                ListaCombos = await combosService.Listar(c => c.Descripcion.ToLower().Contains(ValorFiltro.ToLower()));
+            }
+        }
+        else
+        {
+            ListaCombos = await combosService.Listar(c => c.ComboId > 0);
+        }
+    }
+
+    private async Task Restablecer()
+    {
+        ListaCombos = await combosService.Listar(c => c.ComboId > 0);
+        Filtro = string.Empty;
+        ValorFiltro = string.Empty;
+    }
+}

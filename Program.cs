@@ -1,7 +1,8 @@
+using BlazorBootstrap;
 using MarianelaVentura_AP1_P2.Components;
 using MarianelaVentura_AP1_P2.DAL;
 using MarianelaVentura_AP1_P2.Models;
-using MarianelaVentura_AP1_P2.Service;
+using MarianelaVentura_AP1_P2.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,10 +14,14 @@ builder.Services.AddRazorComponents()
 var ConStr = builder.Configuration.GetConnectionString("SqlConStr");
 builder.Services.AddDbContextFactory<Contexto>(o => o.UseSqlServer(ConStr));
 
-builder.Services.AddScoped<RegistroServices>();
+builder.Services.AddScoped<CombosService>();
+builder.Services.AddScoped<CombosDetalleService>();
+builder.Services.AddScoped<ToastService>();
+
 
 
 builder.Services.AddBlazorBootstrap();
+
 
 var app = builder.Build();
 
