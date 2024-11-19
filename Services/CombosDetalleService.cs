@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System;
 using MarianelaVentura_AP1_P2.DAL;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace MarianelaVentura_AP1_P2.Services
 {
@@ -48,6 +49,15 @@ namespace MarianelaVentura_AP1_P2.Services
                 }
                 return false;
             }
+
+        public async Task<List<Articulos>> ListaArticulos(Expression<Func<Articulos, bool>>? criterio = null)
+        {
+            if (criterio == null)
+                return await contexto.Articulos.AsNoTracking().ToListAsync();
+            else
+                return await contexto.Articulos.Where(criterio).AsNoTracking().ToListAsync();
         }
+
     }
+}
 
