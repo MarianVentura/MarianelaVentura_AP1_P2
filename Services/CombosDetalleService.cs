@@ -76,4 +76,15 @@ public class CombosDetalleService
                 .AsNoTracking()
                 .ToListAsync();
     }
+
+    public async Task<List<CombosDetalle>> ObtenerDetallesPorComboId(int comboId)
+    {
+        await using var contexto = await _dbFactory.CreateDbContextAsync();
+        return await contexto.CombosDetalle
+            .Where(cd => cd.ComboId == comboId)
+            .Include(cd => cd.Articulo) // Asegurarse de incluir el artículo
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
 }
