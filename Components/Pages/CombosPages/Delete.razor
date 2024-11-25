@@ -1,5 +1,106 @@
-﻿<h3>Delete</h3>
+﻿@page "/Combos/Delete/{id:int}"
+@using MarianelaVentura_AP1_P2.Models
+@using MarianelaVentura_AP1_P2.Services
+@inject CombosService combosService
+@inject CombosDetalleService combosDetalleService
+@inject NavigationManager navigationManager
+
+<PageTitle>Eliminar Combo</PageTitle>
+
+<Toasts class="p-3 mt-5" Messages="messages" Placement="ToastsPlacement.TopRight" />
+
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-danger text-white">
+            <h5 class="card-title">Eliminar Combo</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label"><strong>ID:</strong></label>
+                <span>@Combo.ComboId</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Fecha:</strong></label>
+                <span>@Combo.Fecha.ToString("dd/MM/yyyy")</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Descripción:</strong></label>
+                <span>@Combo.Descripcion</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Precio:</strong></label>
+                <span>@Combo.Precio.ToString("C")</span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label"><strong>Vendido:</strong></label>
+                <span>@(Combo.Vendido ? "Sí" : "No")</span>
+            </div>
+
+            @if (Combo.Vendido)
+            {
+                <div class="alert alert-warning" role="alert">
+                    No se puede eliminar el combo porque está vendido.
+                </div>
+            }
+        </div>
+
+        <div class="card-footer text-center mt-2">
+            <a href="/Combos/Index" class="btn btn-secondary">
+                <span class="bi bi-arrow-left"></span> Volver
+            </a>
+            @if (!Combo.Vendido)
+            {
+                <button class="btn btn-danger" @onclick="Eliminar">
+                    <span class="bi bi-trash"></span> Eliminar
+                </button>
+            }
+        </div>
+    </div>
+</div>
 
 @code {
+    [Parameter] public int id { get; set; }
+    public Combos Combo { get; set; } = new Combos();
+    public List<ToastMessage> messages { get; set; } = new List<ToastMessage>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        Combo = await combosService.ObtenerPorId(id);
+    }
+
+    private async Task Eliminar()
+    {
+        if (Combo.Vendido)
+        {
+            ShowMessage(ToastType.Warning, "Advertencia", "No se puede eliminar el combo porque está vendido.");
+            return;
+        }
+
+        var resultado = await combosService.Eliminar(Combo.ComboId);
+        if (resultado)
+        {
+            ShowMessage(ToastType.Success, "Éxito", "El combo ha sido eliminado.");
+            navigationManager.NavigateTo("/Combos/Index");
+        }
+        else
+        {
+            ShowMessage(ToastType.Danger, "Error", "Hubo un problema al eliminar el combo.");
+        }
+    }
+
+    private void ShowMessage(ToastType toastType, string title, string message)
+    {
+        messages.Add(new ToastMessage
+            {
+                Type = toastType,
+                Title = title,
+                Message = message,
+                HelpText = $"{DateTime.Now}"
+            });
+    }
 }
