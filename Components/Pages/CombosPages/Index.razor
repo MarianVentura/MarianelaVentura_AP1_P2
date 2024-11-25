@@ -31,9 +31,13 @@
                     </div>
                 </div>
 
-                @* Botón de restablecer *@
-                <div class="col-md-2 d-flex align-items-center">
-                    <button class="btn btn-outline-secondary" @onclick="Restablecer">Restablecer</button>
+                <div class="col-3">
+                    <button type="button" class="btn btn-outline-secondary bi bi-arrow-clockwise" @onclick="Restablecer"></button>
+                </div>
+                <div class="col text-end">
+                    <a href="/Combos/Create">
+                        <button type="button" class="btn btn-success bi bi-pencil-square"> Crear</button>
+                    </a>
                 </div>
             </div>
 
@@ -69,13 +73,6 @@
                     }
                 </tbody>
             </table>
-
-            @* Botón Crear abajo de la tabla *@
-            <div class="text-end mt-3">
-                <a href="/Combos/Create" class="btn btn-success">
-                    <span class="bi bi-plus-square"></span> Crear
-                </a>
-            </div>
         </div>
 
         <div class="card-footer d-flex justify-content-between align-items-center">
