@@ -1,9 +1,12 @@
 ﻿@page "/Combos/Create"
+@using Microsoft.EntityFrameworkCore
 @using MarianelaVentura_AP1_P2.Models
 @using MarianelaVentura_AP1_P2.Services
+@using MarianelaVentura_AP1_P2.DAL
 @inject CombosService combosService
 @inject CombosDetalleService combosDetalleService
 @inject NavigationManager navigationManager
+@inject IDbContextFactory<Contexto> contextoFactory 
 
 <PageTitle>Crear Combo</PageTitle>
 
@@ -89,7 +92,7 @@
                             @foreach (var detalle in Combo.CombosDetalles)
                             {
                                 <tr>
-                                    <td>@detalle.Articulo.Descripcion</td>
+                                    <td>@ListaArticulos.FirstOrDefault(a => a.ArticuloId == detalle.ArticuloId)?.Descripcion</td>
                                     <td>@detalle.Cantidad</td>
                                     <td>@detalle.Costo</td>
                                     <td>
@@ -124,8 +127,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-      Combo.CombosDetalles = new List<CombosDetalle>();
+        Combo.CombosDetalles = new List<CombosDetalle>();
 
+        // Cargar los artículos directamente desde el contexto de la base de datos.
+        using var context = contextoFactory.CreateDbContext();
+        ListaArticulos = await context.Articulos.ToListAsync();
     }
 
     public void AgregarDetalle()
@@ -147,10 +153,10 @@
             {
                 ArticuloId = DetalleSeleccionado.ArticuloId,
                 Cantidad = DetalleSeleccionado.Cantidad,
-                Costo = articuloSeleccionado.Costo,
+                Costo = articuloSeleccionado.Costo * DetalleSeleccionado.Cantidad,
             });
 
-        DetalleSeleccionado = new CombosDetalle();
+        DetalleSeleccionado = new CombosDetalle();  // Reiniciar el detalle seleccionado
     }
 
     public void RemoverDetalle(CombosDetalle detalle)
@@ -163,7 +169,7 @@
         var paso = await combosService.Crear(Combo);
         if (paso != null)
         {
-            ShowMessage(ToastType.Success,"Éxito", "El combo ha sido guardado.");
+            ShowMessage(ToastType.Success, "Éxito", "El combo ha sido guardado.");
             navigationManager.NavigateTo("/Combos/Index");
         }
         else
