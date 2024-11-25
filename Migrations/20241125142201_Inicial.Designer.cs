@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MarianelaVentura_AP1_P2.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20241118232847_Inicial")]
+    [Migration("20241125142201_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
