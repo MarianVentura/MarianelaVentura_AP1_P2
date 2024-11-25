@@ -89,7 +89,7 @@
                             @foreach (var detalle in Combo.CombosDetalles)
                             {
                                 <tr>
-                                    <td>@detalle.Articulo.Descripcion</td>
+                                    <td>@ListaArticulos.FirstOrDefault(a => a.ArticuloId == detalle.ArticuloId)?.Descripcion</td>
                                     <td>@detalle.Cantidad</td>
                                     <td>@detalle.Costo</td>
                                     <td>
@@ -128,6 +128,8 @@
     {
         Combo = await combosService.ObtenerPorId(id);
         ListaArticulos = await combosDetalleService.ListaArticulos();
+        // Asegurarse de traer los detalles del combo
+        Combo.CombosDetalles = await combosDetalleService.ObtenerDetallesPorComboId(id);
     }
 
     public void AgregarDetalle()
@@ -149,7 +151,7 @@
             {
                 ArticuloId = DetalleSeleccionado.ArticuloId,
                 Cantidad = DetalleSeleccionado.Cantidad,
-                Costo = articuloSeleccionado.Costo,
+                Costo = articuloSeleccionado.Costo * DetalleSeleccionado.Cantidad, // Multiplicar cantidad por costo
             });
 
         DetalleSeleccionado = new CombosDetalle();
@@ -185,4 +187,3 @@
             });
     }
 }
-
